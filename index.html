@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🚀 Space Brain Quiz</title>
+<style>
+  :root {
+    --pink: #ff2fa3;
+    --purple: #7b2ff7;
+    --blue: #2f8cff;
+    --yellow: #ffd93d;
+    --green: #2dffb0;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
+  }
+
+  body {
+    min-height: 100vh;
+    background: radial-gradient(circle at 20% 20%, #1a0b3d, #05010f 70%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    position: relative;
+  }
+
+  /* twinkling stars */
+  .stars, .stars2, .stars3 {
+    position: fixed;
+    inset: 0;
+    background-repeat: repeat;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .stars {
+    background-image: radial-gradient(1.5px 1.5px at 20px 30px, #fff, transparent),
+                       radial-gradient(1.5px 1.5px at 90px 80px, #fff, transparent),
+                       radial-gradient(1px 1px at 150px 40px, #fff, transparent),
+                       radial-gradient(1px 1px at 60px 120px, #fff, transparent);
+    background-size: 200px 200px;
+    animation: drift 60s linear infinite;
+    opacity: 0.8;
+  }
+  .stars2 {
+    background-image: radial-gradient(2px 2px at 40px 60px, #ffd93d, transparent),
+                       radial-gradient(1.5px 1.5px at 120px 10px, #2dffb0, transparent),
+                       radial-gradient(1.5px 1.5px at 170px 100px, #ff2fa3, transparent);
+    background-size: 220px 220px;
+    animation: drift 90s linear infinite reverse;
+    opacity: 0.6;
+  }
+  .stars3 {
+    background-image: radial-gradient(1px 1px at 10px 10px, #fff, transparent),
+                       radial-gradient(1px 1px at 190px 150px, #fff, transparent);
+    background-size: 300px 300px;
+    animation: drift 120s linear infinite;
+    opacity: 0.5;
+  }
+  @keyframes drift {
+    from { transform: translateY(0); }
+    to { transform: translateY(-400px); }
+  }
+
+  .card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 440px;
+    background: linear-gradient(160deg, rgba(123,47,247,0.35), rgba(47,140,255,0.2));
+    border: 2px solid rgba(255,255,255,0.15);
+    border-radius: 24px;
+    padding: 22px 20px 26px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  }
+
+  h1 {
+    margin: 0 0 4px;
+    font-size: 1.5rem;
+    text-align: center;
+    background: linear-gradient(90deg, var(--pink), var(--yellow), var(--green));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    line-height: 1.2;
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #cfc9ff;
+    margin-bottom: 18px;
+  }
+
+  .progress-wrap {
+    height: 10px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--pink), var(--purple), var(--blue));
+    border-radius: 10px;
+    transition: width 0.4s ease;
+  }
+
+  .qnum {
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--yellow);
+    font-weight: 700;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+
+  .question {
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 18px;
+    line-height: 1.4;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+    padding: 14px 16px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(255,255,255,0.08);
+    border: 2px solid rgba(255,255,255,0.18);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .option:active { transform: scale(0.97); }
+  .option.selected {
+    border-color: var(--yellow);
+    background: rgba(255,217,61,0.18);
+  }
+  .option.correct {
+    border-color: var(--green);
+    background: rgba(45,255,176,0.22);
+  }
+  .option.wrong {
+    border-color: var(--pink);
+    background: rgba(255,47,163,0.22);
+  }
+  .option .emoji { font-size: 1.3rem; }
+  .option[disabled] { pointer-events: none; }
+
+  .feedback {
+    min-height: 22px;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-top: 14px;
+    color: var(--green);
+  }
+  .feedback.wrong { color: var(--pink); }
+
+  .next-btn {
+    display: block;
+    width: 100%;
+    margin-top: 16px;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #1a0b3d;
+    background: linear-gradient(90deg, var(--yellow), var(--green));
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .next-btn.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .next-btn:active { transform: scale(0.97); }
+
+  /* result screen */
+  .result {
+    display: none;
+    text-align: center;
+  }
+  .result.show { display: block; }
+  .result .big-emoji {
+    font-size: 4rem;
+    margin-bottom: 6px;
+    animation: bob 2s ease-in-out infinite;
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-10px) rotate(3deg); }
+  }
+  .result h2 {
+    font-size: 1.4rem;
+    margin: 6px 0 4px;
+    background: linear-gradient(90deg, var(--pink), var(--yellow));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .result .score {
+    font-size: 0.95rem;
+    color: var(--green);
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .result p.desc {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #e6e1ff;
+    margin: 0 0 20px;
+  }
+  .retake-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #fff;
+    background: linear-gradient(90deg, var(--pink), var(--purple));
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+  }
+  .retake-btn:active { transform: scale(0.97); }
+
+  .quiz-body.hide { display: none; }
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<div class="stars2"></div>
+<div class="stars3"></div>
+
+<div class="card">
+  <h1>🚀 SPACE BRAIN QUIZ 🪐</h1>
+  <p class="subtitle">5 questions. Zero gravity. Maximum chaos.</p>
+
+  <div id="quizBody" class="quiz-body">
+    <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="qnum" id="qnum">QUESTION 1 / 5</div>
+    <div class="question" id="questionText"></div>
+    <div class="options" id="optionsWrap"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="nextBtn">NEXT ➜</button>
+  </div>
+
+  <div class="result" id="result">
+    <div class="big-emoji" id="resultEmoji">🛸</div>
+    <h2 id="resultTitle"></h2>
+    <div class="score" id="resultScore"></div>
+    <p class="desc" id="resultDesc"></p>
+    <button class="retake-btn" id="retakeBtn">🔁 BLAST OFF AGAIN</button>
+  </div>
+</div>
+
+<script>
+  const questions = [
+    {
+      q: "Which planet is famous for basically being a giant windy hurricane forever?",
+      opts: [
+        { text: "Mercury", emoji: "🪨" },
+        { text: "Jupiter", emoji: "🌀" },
+        { text: "Earth", emoji: "🌍" },
+        { text: "Pluto", emoji: "❄️" }
+      ],
+      correct: 1,
+      fact: "Jupiter's Great Red Spot is a storm bigger than Earth. It's been raging for centuries. Rude."
+    },
+    {
+      q: "What do astronauts do when their nose itches inside a space helmet?",
+      opts: [
+        { text: "Scratch it against the visor like a weirdo", emoji: "🤪" },
+        { text: "Suffer in silence", emoji: "😭" },
+        { text: "Ask mission control for help", emoji: "📡" },
+        { text: "Sneeze into space", emoji: "🌌" }
+      ],
+      correct: 0,
+      fact: "Yep — astronauts really do rub their nose on a little pad inside the helmet. Living the dream."
+    },
+    {
+      q: "How long does it take sunlight to reach Earth?",
+      opts: [
+        { text: "Instantly, duh", emoji: "⚡" },
+        { text: "About 8 minutes", emoji: "⏱️" },
+        { text: "1 hour", emoji: "🕐" },
+        { text: "3 days", emoji: "📆" },
+      ],
+      correct: 1,
+      fact: "So when you see a sunrise, you're basically watching an 8-minute-old rerun of the Sun."
+    },
+    {
+      q: "What is a 'shooting star' actually made of?",
+      opts: [
+        { text: "A tiny fallen star", emoji: "⭐" },
+        { text: "Space dust or a rock burning up", emoji: "🔥" },
+        { text: "An alien selfie flash", emoji: "👽" },
+        { text: "Satellite glitter", emoji: "✨" }
+      ],
+      correct: 1,
+      fact: "It's just space rubble having a very dramatic, very fiery entrance. Icon behavior."
+    },
+    {
+      q: "Which of these is a real name for a group of astronauts going to space together?",
+      opts: [
+        { text: "A crew", emoji: "🧑‍🚀" },
+        { text: "A squad goal", emoji: "🎯" },
+        { text: "A flock", emoji: "🐦" },
+        { text: "A rocket gang", emoji: "🤖" }
+      ],
+      correct: 0,
+      fact: "They call it a 'crew,' not a 'squad,' sadly. NASA needs better branding."
+    }
+  ];
+
+  let current = 0;
+  let score = 0;
+  let answered = false;
+
+  const qnumEl = document.getElementById('qnum');
+  const questionText = document.getElementById('questionText');
+  const optionsWrap = document.getElementById('optionsWrap');
+  const feedback = document.getElementById('feedback');
+  const nextBtn = document.getElementById('nextBtn');
+  const progressBar = document.getElementById('progressBar');
+  const quizBody = document.getElementById('quizBody');
+  const result = document.getElementById('result');
+
+  function renderQuestion() {
+    answered = false;
+    feedback.textContent = '';
+    feedback.className = 'feedback';
+    nextBtn.classList.remove('show');
+
+    const q = questions[current];
+    qnumEl.textContent = `QUESTION ${current + 1} / ${questions.length}`;
+    progressBar.style.width = `${(current / questions.length) * 100}%`;
+    questionText.textContent = q.q;
+
+    optionsWrap.innerHTML = '';
+    q.opts.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'option';
+      btn.innerHTML = `<span class="emoji">${opt.emoji}</span><span>${opt.text}</span>`;
+      btn.addEventListener('click', () => selectOption(i, btn));
+      optionsWrap.appendChild(btn);
+    });
+  }
+
+  function selectOption(i, btn) {
+    if (answered) return;
+    answered = true;
+    const q = questions[current];
+    const allBtns = optionsWrap.querySelectorAll('.option');
+    allBtns.forEach(b => b.setAttribute('disabled', 'true'));
+
+    if (i === q.correct) {
+      score++;
+      btn.classList.add('correct');
+      feedback.textContent = `✅ Correct! ${q.fact}`;
+      feedback.classList.remove('wrong');
+    } else {
+      btn.classList.add('wrong');
+      allBtns[q.correct].classList.add('correct');
+      feedback.textContent = `❌ Nope. ${q.fact}`;
+      feedback.classList.add('wrong');
+    }
+
+    nextBtn.classList.add('show');
+    nextBtn.textContent = current === questions.length - 1 ? "SEE MY RESULT 🎉" : "NEXT ➜";
+  }
+
+  nextBtn.addEventListener('click', () => {
+    current++;
+    if (current >= questions.length) {
+      showResult();
+    } else {
+      renderQuestion();
+    }
+  });
+
+  const results = [
+    {
+      min: 5,
+      emoji: "👑",
+      title: "SUPREME GALACTIC OVERLORD",
+      desc: "5 out of 5?! NASA should be calling YOU for advice. You have officially achieved big brain energy. Somewhere, an alien is taking notes."
+    },
+    {
+      min: 4,
+      emoji: "🧠",
+      title: "cosmic genius (basically)",
+      desc: "So close to perfect it's kind of annoying. You know more about space than most planets know about themselves."
+    },
+    {
+      min: 3,
+      emoji: "🧑‍🚀",
+      title: "SOLID SPACE CADET",
+      desc: "Respectable! You'd survive at least the first 10 minutes of astronaut training before getting distracted by snacks."
+    },
+    {
+      min: 2,
+      emoji: "🛰️",
+      title: "CONFUSED SATELLITE",
+      desc: "You're up there, orbiting the truth, but not quite landing on it. Still, you didn't crash into anything. Win."
+    },
+    {
+      min: 0,
+      emoji: "🥔",
+      title: "SPACE POTATO",
+      desc: "Fun fact: there IS a real asteroid shaped like a potato. You'd fit right in up there. No judgment, just vibes."
+    }
+  ];
+
+  function getResult(score) {
+    return results.find(r => score >= r.min);
+  }
+
+  function showResult() {
+    quizBody.classList.add('hide');
+    progressBar.style.width = '100%';
+    const r = getResult(score);
+
+    document.getElementById('resultEmoji').textContent = r.emoji;
+    document.getElementById('resultTitle').textContent = r.title;
+    document.getElementById('resultScore').textContent = `You scored ${score} / ${questions.length}`;
+    document.getElementById('resultDesc').textContent = r.desc;
+    result.classList.add('show');
+  }
+
+  document.getElementById('retakeBtn').addEventListener('click', () => {
+    current = 0;
+    score = 0;
+    result.classList.remove('show');
+    quizBody.classList.remove('hide');
+    renderQuestion();
+  });
+
+  renderQuestion();
+</script>
+</body>
+</html>
