@@ -1,12 +1,12 @@
 import axios, { AxiosInstance } from 'axios';
-import * as SecureStore from 'expo-secure-store';
+import { secureGet, secureSet } from '@/lib/secureStorage';
 import type { Api } from './contract';
 import { ApiError } from './types';
 
 const TOKEN_KEY = 'sendplate.token';
 
 export async function saveToken(token: string) {
-  await SecureStore.setItemAsync(TOKEN_KEY, token);
+  await secureSet(TOKEN_KEY, token);
 }
 
 /**
@@ -18,7 +18,7 @@ export function createHttpApi(baseURL: string): Api {
   const client: AxiosInstance = axios.create({ baseURL, timeout: 30_000 });
 
   client.interceptors.request.use(async (config) => {
-    const token = await SecureStore.getItemAsync(TOKEN_KEY);
+    const token = await secureGet(TOKEN_KEY);
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   });

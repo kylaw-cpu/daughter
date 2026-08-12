@@ -56,12 +56,15 @@ export default function RootLayout() {
   // Inter covers Latin; non-Latin scripts (Arabic etc.) fall back to the
   // platform's Noto-based system fonts, keeping the download under the 25 MB
   // target instead of bundling every Noto Sans script variant.
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,
   });
+  // If fonts fail (e.g. constrained web preview), render with system fallback
+  // rather than blanking the app.
+  const fontsReady = fontsLoaded || fontError != null;
   const [ready, setReady] = useState(false);
   const hydrate = useAuth((s) => s.hydrate);
 
@@ -76,10 +79,10 @@ export default function RootLayout() {
   }, [hydrate]);
 
   useEffect(() => {
-    if (fontsLoaded && ready) SplashScreen.hideAsync().catch(() => {});
-  }, [fontsLoaded, ready]);
+    if (fontsReady && ready) SplashScreen.hideAsync().catch(() => {});
+  }, [fontsReady, ready]);
 
-  if (!fontsLoaded || !ready) return null;
+  if (!fontsReady || !ready) return null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

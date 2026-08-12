@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as SecureStore from 'expo-secure-store';
+import { secureDelete, secureGet, secureSet } from '@/lib/secureStorage';
 import type { Role, User } from '@/api/types';
 
 /**
@@ -71,7 +71,7 @@ export const useAuth = create<AuthState>((set, get) => ({
     try {
       const raw = await AsyncStorage.getItem(USER_CACHE_KEY);
       user = raw ? (JSON.parse(raw) as User) : null;
-      hasPin = (await SecureStore.getItemAsync(PIN_KEY)) != null;
+      hasPin = (await secureGet(PIN_KEY)) != null;
     } catch {
       // Fall through to signed-out state; never block launch on storage.
     }
@@ -97,23 +97,23 @@ export const useAuth = create<AuthState>((set, get) => ({
   },
 
   async savePin(pin) {
-    await SecureStore.setItemAsync(PIN_KEY, hashPin(pin));
+    await secureSet(PIN_KEY, hashPin(pin));
     set({ hasPin: true, unlocked: true });
   },
 
   async verifyPin(pin) {
-    const stored = await SecureStore.getItemAsync(PIN_KEY);
+    const stored = await secureGet(PIN_KEY);
     return stored != null && stored === hashPin(pin);
   },
 
   async saveToken(token) {
-    await SecureStore.setItemAsync(TOKEN_KEY, token);
+    await secureSet(TOKEN_KEY, token);
   },
 
   async signOut() {
     try {
-      await SecureStore.deleteItemAsync(PIN_KEY);
-      await SecureStore.deleteItemAsync(TOKEN_KEY);
+      await secureDelete(PIN_KEY);
+      await secureDelete(TOKEN_KEY);
       await AsyncStorage.removeItem(USER_CACHE_KEY);
     } catch {
       // Best-effort cleanup.

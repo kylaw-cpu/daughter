@@ -14,6 +14,7 @@ import { priceItems, toSenderAmount } from '@/lib/pricing';
 import {
   FX_RATE,
   LOCAL_CURRENCY,
+  PROOF_PHOTO_PLACEHOLDER,
   MOCK_VENDORS,
   SENDER_CURRENCY,
   buildMockNudges,
@@ -105,7 +106,7 @@ async function progressOrders(d: MockDb): Promise<void> {
       order.proof = {
         vendorId: vendor?.id ?? 'ven_mama_akinyi',
         collectedAt: new Date().toISOString(),
-        photoUrl: 'https://picsum.photos/seed/sendplate-proof/640/480',
+        photoUrl: PROOF_PHOTO_PLACEHOLDER,
         note: 'All items handed over. Karibu!',
         location: vendor?.location,
         itemsDelivered: order.items,
