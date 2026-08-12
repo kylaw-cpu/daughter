@@ -1,0 +1,17 @@
+import { Stack } from 'expo-router';
+import React from 'react';
+import { useTheme } from '@/theme/ThemeProvider';
+
+/** The send flow stack, pushed over the sender tabs (spec §5). */
+export default function SendLayout() {
+  const theme = useTheme();
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: theme.colors.bg },
+        animation: 'slide_from_right',
+      }}
+    />
+  );
+}
