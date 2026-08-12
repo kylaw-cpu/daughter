@@ -1,0 +1,9 @@
+{
+  "owner": {
+    "username": "kylaw-cpu",
+    "email": "poe@hello-air.com"
+  },
+  "record": {
+    "TXT": "p=REPLACE_WITH_RESEND_DKIM_PUBLIC_KEY"
+  }
+}

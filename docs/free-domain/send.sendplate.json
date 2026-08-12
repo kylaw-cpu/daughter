@@ -1,0 +1,10 @@
+{
+  "owner": {
+    "username": "kylaw-cpu",
+    "email": "poe@hello-air.com"
+  },
+  "record": {
+    "MX": ["REPLACE_WITH_RESEND_MX_VALUE.amazonses.com"],
+    "TXT": "v=spf1 include:amazonses.com ~all"
+  }
+}
