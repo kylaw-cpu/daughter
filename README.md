@@ -85,28 +85,40 @@ src/
   contract), Stripe PaymentSheet, push notifications, photo upload, SMS-only recipients
 - **Phase 5** — beta hardening: crash reporting, remote config, field tests on 2G
 
-## Sending verification codes (Phase 4)
+## Real verification codes with Resend
 
-Sign-in is email + 6-digit code. The app calls `POST /auth/otp/request`
-(`src/api/httpApi.ts`); the backend generates the code and emails it via a
-transactional provider. Free options that work well for OTP volume (2026):
+Sign-in is email + 6-digit code. `server/index.mjs` is a zero-dependency
+auth service that generates codes, stores them hashed with a 10-minute
+expiry, and emails them through Resend (free tier: 3,000 emails/month,
+100/day). The rest of the app keeps running on the mock until Phase 4.
 
-- **Resend** — 3,000 emails/month free (100/day), the nicest developer API:
-  ```js
-  import { Resend } from 'resend';
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  await resend.emails.send({
-    from: 'SendPlate <verify@yourdomain.com>',
-    to: email,
-    subject: `${code} is your SendPlate code`,
-    text: `Your SendPlate verification code is ${code}. It expires in 10 minutes.`,
-  });
-  ```
-- **Brevo** — 300 emails/day free with no expiry; higher steady-state volume.
-- SendGrid's free plan was retired in 2025 (60-day trial only) — avoid.
+Setup:
 
-Either provider needs a verified sending domain for good deliverability
-(SPF + DKIM records).
+1. Create a free account at https://resend.com and copy an API key
+   (starts with `re_`).
+2. Start the auth service:
+   ```bash
+   RESEND_API_KEY=re_xxx npm run auth-server
+   ```
+   Without a key it runs in dev mode and prints codes to the console.
+   Without a verified domain, Resend's shared `onboarding@resend.dev`
+   sender can only deliver to the email that owns your Resend account —
+   fine for testing yourself.
+3. Point the app at it (use your machine's LAN IP so a phone can reach it):
+   ```bash
+   EXPO_PUBLIC_AUTH_API_URL=http://192.168.1.20:8787 npx expo start
+   ```
+   When unset, the app falls back to the mock (any code works).
+4. For real users: verify your sending domain in Resend (SPF + DKIM DNS
+   records) and set `RESEND_FROM="SendPlate <verify@yourdomain.com>"` —
+   codes from unverified senders land in spam.
+
+The service enforces: hashed single-use codes, 10-minute expiry, 5 attempts
+per code, a 30-second resend cooldown per email. Codes live in memory —
+swap for Redis/Postgres when running more than one instance (Phase 4).
+
+Alternative free provider if volume outgrows Resend's 100/day: Brevo
+(300 emails/day). SendGrid's free plan was retired in 2025.
 
 ## Notes on deliberate choices
 
