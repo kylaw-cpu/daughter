@@ -5,8 +5,10 @@ import { I18nManager } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { en } from './locales/en';
 import { ar } from './locales/ar';
+import { zh } from './locales/zh';
 
 export const SUPPORTED_LANGUAGES = [
+  { code: 'zh-HK', label: '繁體中文', rtl: false },
   { code: 'en', label: 'English', rtl: false },
   { code: 'ar', label: 'العربية', rtl: true },
 ] as const;
@@ -17,6 +19,8 @@ const LANGUAGE_KEY = 'sendplate.language';
 
 function deviceLanguage(): LanguageCode {
   const device = getLocales()[0]?.languageCode ?? 'en';
+  // Any Chinese-locale device gets Traditional Chinese (Hong Kong).
+  if (device === 'zh') return 'zh-HK';
   return SUPPORTED_LANGUAGES.some((l) => l.code === device)
     ? (device as LanguageCode)
     : 'en';
@@ -25,7 +29,7 @@ function deviceLanguage(): LanguageCode {
 export function initI18n(initialLanguage?: string) {
   if (i18n.isInitialized) return i18n;
   i18n.use(initReactI18next).init({
-    resources: { en, ar },
+    resources: { en, ar, 'zh-HK': zh },
     lng: initialLanguage ?? deviceLanguage(),
     fallbackLng: 'en',
     interpolation: { escapeValue: false },

@@ -2,10 +2,15 @@
 
 Send food, not just money — and see it arrive.
 
-SendPlate is a nutrition-remittance mobile app: people working abroad send
-targeted nutrition and health credit to family back home. The credit is
-redeemable only at vetted local vendors and clinics, and the sender receives
-photo proof that the food or care was actually collected.
+SendPlate is a nutrition-remittance mobile app: send targeted nutrition and
+health credit to family instead of raw cash. The credit is redeemable only at
+vetted local vendors and clinics, and the sender receives photo proof that the
+food or care was actually collected.
+
+The demo region is **Hong Kong**, with the whole loop local: family (in HK or
+abroad) sends in HKD, relatives redeem at HK shops, pharmacies and District
+Health Centres, all in one currency (the FX machinery stays in place for
+multi-currency corridors later).
 
 ```
 Sender picks a package → pays → Recipient gets a claim code
@@ -17,7 +22,7 @@ Sender picks a package → pays → Recipient gets a claim code
 
 - **Expo SDK 54** (managed workflow) + **TypeScript strict** + **expo-router**
 - **@tanstack/react-query** (server state) + **zustand** (local/UI state)
-- **i18next** — English + Arabic (RTL) seeded; every string localized
+- **i18next** — Traditional Chinese (Hong Kong) + English + Arabic (RTL); every string localized
 - **expo-secure-store** (token + salted PIN hash), **AsyncStorage** (offline caches, mock DB)
 - **expo-camera** (QR scan + proof photos), **react-native-qrcode-svg** (code display)
 - **expo-speech** (audio prompts), **expo-brightness** (code-screen boost)

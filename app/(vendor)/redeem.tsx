@@ -285,7 +285,7 @@ export default function RedeemScreen() {
                 label={t('sender.vendorNote')}
                 value={note}
                 onChangeText={setNote}
-                placeholder="Karibu!"
+                placeholder="多謝！"
               />
             </View>
           )}

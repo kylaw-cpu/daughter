@@ -107,7 +107,7 @@ async function progressOrders(d: MockDb): Promise<void> {
         vendorId: vendor?.id ?? 'ven_mama_akinyi',
         collectedAt: new Date().toISOString(),
         photoUrl: PROOF_PHOTO_PLACEHOLDER,
-        note: 'All items handed over. Karibu!',
+        note: '已交收所有物品 · All items handed over',
         location: vendor?.location,
         itemsDelivered: order.items,
       };
@@ -136,16 +136,17 @@ function priceOrder(items: PackageItem[], template: PackageTemplate) {
  */
 async function seedRecipientDemo(d: MockDb): Promise<void> {
   if (d.orders.length > 0) return;
-  const template = buildPackageTemplates()[0]!;
+  const templates = buildPackageTemplates();
+  const template = templates.find((t) => t.key === 'elderly_care') ?? templates[0]!;
   const items = template.baseItems;
   const { amountLocal, amountSender, serviceFee } = priceOrder(items, template);
   const recipient: Recipient = {
     id: id('rcp'),
     senderId: 'usr_demo_sender',
     name: d.user?.name ?? 'Mama',
-    phone: d.user?.phone ?? '+254700000000',
+    phone: d.user?.phone ?? '+85291234567',
     relationship: 'daughter',
-    town: 'Kisumu',
+    town: 'Sham Shui Po 深水埗',
     language: d.user?.language ?? 'en',
   };
   d.recipients.push(recipient);

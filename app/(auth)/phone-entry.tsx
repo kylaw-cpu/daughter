@@ -10,13 +10,15 @@ import { useAuth } from '@/store/auth';
 import { radius, spacing } from '@/theme/theme';
 import { useTheme } from '@/theme/ThemeProvider';
 
+// Hong Kong first (the whole loop is local); a few common diaspora countries
+// follow for family members signing up from abroad.
 const COUNTRIES: Array<{ code: CountryCode; dial: string; flag: string }> = [
-  { code: 'KE', dial: '+254', flag: '🇰🇪' },
-  { code: 'US', dial: '+1', flag: '🇺🇸' },
+  { code: 'HK', dial: '+852', flag: '🇭🇰' },
   { code: 'GB', dial: '+44', flag: '🇬🇧' },
-  { code: 'AE', dial: '+971', flag: '🇦🇪' },
-  { code: 'SA', dial: '+966', flag: '🇸🇦' },
-  { code: 'DE', dial: '+49', flag: '🇩🇪' },
+  { code: 'CA', dial: '+1', flag: '🇨🇦' },
+  { code: 'AU', dial: '+61', flag: '🇦🇺' },
+  { code: 'US', dial: '+1', flag: '🇺🇸' },
+  { code: 'SG', dial: '+65', flag: '🇸🇬' },
 ];
 
 export default function PhoneEntryScreen() {
@@ -28,7 +30,7 @@ export default function PhoneEntryScreen() {
 
   const detected = useMemo<CountryCode>(() => {
     const region = getLocales()[0]?.regionCode as CountryCode | undefined;
-    return region && COUNTRIES.some((c) => c.code === region) ? region : 'KE';
+    return region && COUNTRIES.some((c) => c.code === region) ? region : 'HK';
   }, []);
   const [country, setCountry] = useState<CountryCode>(detected);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -36,7 +38,7 @@ export default function PhoneEntryScreen() {
   const [error, setError] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
 
-  const dial = COUNTRIES.find((c) => c.code === country)?.dial ?? '+254';
+  const dial = COUNTRIES.find((c) => c.code === country)?.dial ?? '+852';
 
   const submit = async () => {
     const parsed = parsePhoneNumberFromString(national, country);

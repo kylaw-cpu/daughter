@@ -102,10 +102,13 @@ export default function ReviewScreen() {
           <View style={{ gap: spacing.xs }}>
             <PriceRow label={t('sender.itemCost')} value={formatMoney(amountSender, currency)} />
             <PriceRow label={t('sender.serviceFee')} value={formatMoney(serviceFee, currency)} />
-            <PriceRow
-              label={t('sender.fxRate')}
-              value={`1 ${currency} ≈ ${FX_RATE.toFixed(0)} ${LOCAL_CURRENCY}`}
-            />
+            {/* Single-currency loop (HK): no FX to disclose when the rate is 1. */}
+            {FX_RATE !== 1 && (
+              <PriceRow
+                label={t('sender.fxRate')}
+                value={`1 ${currency} ≈ ${FX_RATE.toFixed(0)} ${LOCAL_CURRENCY}`}
+              />
+            )}
             <View style={{ height: 1, backgroundColor: colors.border, marginVertical: spacing.xxs }} />
             <PriceRow label={t('sender.total')} value={formatMoney(total, currency)} strong />
           </View>

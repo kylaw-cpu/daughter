@@ -66,9 +66,11 @@ export function PackageCard({
           </Text>
           <View style={{ marginTop: spacing.xxs }}>
             <Text variant="bodyStrong">{formatMoney(priceSender, senderCurrency)}</Text>
-            <Text variant="caption" color="muted">
-              ≈ {formatMoney(template.basePriceLocal, localCurrency)}
-            </Text>
+            {localCurrency !== senderCurrency && (
+              <Text variant="caption" color="muted">
+                ≈ {formatMoney(template.basePriceLocal, localCurrency)}
+              </Text>
+            )}
           </View>
         </View>
       </View>

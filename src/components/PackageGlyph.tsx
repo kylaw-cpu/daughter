@@ -61,6 +61,20 @@ export function PackageGlyph({ glyph, size = 56 }: { glyph: string; size?: numbe
         </Svg>
       );
       break;
+    case 'elderly_care': // rice bowl with chopsticks + heart
+      art = (
+        <Svg width={size * 0.62} height={size * 0.62} viewBox="0 0 48 48" fill="none">
+          <Path d="M8 24h32c0 9-7 16-16 16S8 33 8 24Z" fill={fill} stroke={stroke} strokeWidth={2.5} strokeLinejoin="round" />
+          <Path d="M12 40h24" stroke={stroke} strokeWidth={2.5} strokeLinecap="round" />
+          <Path d="M14 18 40 8M20 20 44 12" stroke={stroke} strokeWidth={2.5} strokeLinecap="round" />
+          <Path
+            d="M24 32s-6-3.6-6-7.4c0-2 1.6-3.3 3.3-3.3 1.1 0 2.1.6 2.7 1.5.6-.9 1.6-1.5 2.7-1.5 1.7 0 3.3 1.3 3.3 3.3 0 3.8-6 7.4-6 7.4Z"
+            fill={accent}
+            opacity={0.9}
+          />
+        </Svg>
+      );
+      break;
     default:
       art = (
         <Svg width={size * 0.62} height={size * 0.62} viewBox="0 0 48 48" fill="none">

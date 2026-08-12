@@ -2,13 +2,14 @@ import i18n from '@/i18n';
 import type { HealthNudge, PackageItem, PackageTemplate, Vendor } from './types';
 
 /**
- * Mock catalog & vendor data. Prices are integer minor units in the
- * recipient's local currency (demo region: Kenya, KES).
+ * Mock catalog & vendor data. Prices are integer minor units.
+ * Demo region: Hong Kong — the whole loop (sender, recipient, vendors) is
+ * local, so both sides use HKD and there is no FX conversion (rate 1).
  */
-export const LOCAL_CURRENCY = 'KES';
-export const SENDER_CURRENCY = 'USD';
-/** KES per USD, locked into orders at review time. */
-export const FX_RATE = 129.0;
+export const LOCAL_CURRENCY = 'HKD';
+export const SENDER_CURRENCY = 'HKD';
+/** Single-currency loop: locked at 1. The FX row hides when rate === 1. */
+export const FX_RATE: number = 1;
 
 function item(key: string, quantity: number, nutrients?: string[]): PackageItem {
   return { key, label: i18n.t(`packages.items.${key}`), quantity, nutrients };
@@ -33,8 +34,7 @@ export function buildPackageTemplates(): PackageTemplate[] {
         item('vitamin_a', 1, ['vitamin_a']),
         item('deworming', 1),
       ],
-      basePriceLocal: 155_000, // KES 1,550
-      popular: true,
+      basePriceLocal: 28_000, // HK$280
     },
     {
       id: 'tpl_mother_baby',
@@ -49,7 +49,7 @@ export function buildPackageTemplates(): PackageTemplate[] {
         item('iron_flour', 1, ['iron']),
       ],
       addOns: [item('iron_supplement', 1, ['iron'])],
-      basePriceLocal: 210_000,
+      basePriceLocal: 46_000, // HK$460
     },
     {
       id: 'tpl_family_staples',
@@ -65,7 +65,7 @@ export function buildPackageTemplates(): PackageTemplate[] {
         item('iron_flour', 1, ['iron']),
       ],
       addOns: [item('eggs_30', 1, ['protein'])],
-      basePriceLocal: 185_000,
+      basePriceLocal: 32_000, // HK$320
     },
     {
       id: 'tpl_clinic_visit',
@@ -76,7 +76,24 @@ export function buildPackageTemplates(): PackageTemplate[] {
       category: 'health',
       baseItems: [item('consultation', 1), item('multivitamins', 1)],
       addOns: [item('deworming', 1), item('vitamin_a', 1, ['vitamin_a'])],
-      basePriceLocal: 120_000,
+      basePriceLocal: 40_000, // HK$400
+    },
+    {
+      id: 'tpl_elderly_care',
+      key: 'elderly_care',
+      name: i18n.t('packages.elderly_care.name'),
+      description: i18n.t('packages.elderly_care.description'),
+      glyph: 'elderly_care',
+      category: 'mixed',
+      baseItems: [
+        item('rice_5kg', 1),
+        item('canned_fish', 1, ['protein', 'calcium']),
+        item('nutrition_milk', 1, ['protein', 'calcium']),
+        item('multivitamins', 1),
+      ],
+      addOns: [item('calcium', 1, ['calcium']), item('bp_check', 1)],
+      basePriceLocal: 33_000, // HK$330
+      popular: true,
     },
   ];
 }
@@ -91,42 +108,42 @@ export const PROOF_PHOTO_PLACEHOLDER =
 
 export const MOCK_VENDORS: Vendor[] = [
   {
-    id: 'ven_mama_akinyi',
-    name: "Mama Akinyi's Provisions",
+    id: 'ven_wing_kee',
+    name: 'Wing Kee Provisions 榮記糧油',
     type: 'food',
-    location: { lat: -0.0917, lng: 34.768 },
-    address: 'Kibuye Market, Stall 14, Kisumu',
+    location: { lat: 22.3286, lng: 114.1602 },
+    address: 'Shop 12, Pei Ho Street Market, Sham Shui Po 深水埗北河街街市12號舖',
     hours: '7:00–19:00',
     verified: true,
     offeredCategories: ['food'],
   },
   {
-    id: 'ven_afya_pharmacy',
-    name: 'Afya Bora Pharmacy',
+    id: 'ven_kwong_on',
+    name: 'Kwong On Dispensary 廣安藥房',
     type: 'pharmacy',
-    location: { lat: -0.0889, lng: 34.7602 },
-    address: 'Oginga Odinga St, Kisumu',
-    hours: '8:00–20:00',
+    location: { lat: 22.3193, lng: 114.1694 },
+    address: '168 Sai Yeung Choi St South, Mong Kok 旺角西洋菜南街168號',
+    hours: '9:00–21:00',
     verified: true,
     offeredCategories: ['health'],
   },
   {
-    id: 'ven_tumaini_clinic',
-    name: 'Tumaini Community Clinic',
+    id: 'ven_dhc',
+    name: 'Sham Shui Po District Health Centre 深水埗地區康健中心',
     type: 'clinic',
-    location: { lat: -0.1024, lng: 34.7551 },
-    address: 'Nyalenda B, Kisumu',
-    hours: '8:00–17:00',
+    location: { lat: 22.3372, lng: 114.1552 },
+    address: '303 Cheung Sha Wan Road, Sham Shui Po 長沙灣道303號',
+    hours: '9:00–18:00',
     verified: true,
     offeredCategories: ['health'],
   },
   {
-    id: 'ven_soko_fresh',
-    name: 'Soko Fresh Grocers',
+    id: 'ven_fresh_market',
+    name: 'Kwun Tong Fresh Market 觀塘鮮活街市',
     type: 'market',
-    location: { lat: -0.0951, lng: 34.7719 },
-    address: 'Jomo Kenyatta Hwy, Kisumu',
-    hours: '6:30–18:30',
+    location: { lat: 22.3122, lng: 114.2252 },
+    address: 'Yue Man Square, Kwun Tong 觀塘裕民坊',
+    hours: '6:30–19:00',
     verified: true,
     offeredCategories: ['food'],
   },
@@ -143,38 +160,29 @@ export function buildMockNudges(recipientId: string): HealthNudge[] {
   const inDays = (d: number) => new Date(Date.now() + d * 86_400_000).toISOString();
   return [
     {
-      id: 'ndg_vita',
+      id: 'ndg_sun',
       recipientId,
       icon: 'sun',
-      message:
-        i18n.language === 'ar'
-          ? 'أطفالك يحصلون على البروتين — قطرات فيتامين أ مجانية في العيادة القريبة يوم الخميس.'
-          : 'Your kids are getting protein — Vitamin A drops are free at the clinic 2 km away this Thursday.',
-      action: { label: i18n.t('recipient.seeClinic'), type: 'clinic', payload: 'ven_tumaini_clinic' },
-      priority: 'normal',
-      expiresAt: inDays(6),
-    },
-    {
-      id: 'ndg_water',
-      recipientId,
-      icon: 'droplet',
-      message:
-        i18n.language === 'ar'
-          ? 'الماء النظيف يساعد الحديد على العمل — اغلِ ماء الشرب هذا الأسبوع.'
-          : 'Clean water helps iron do its work — boil drinking water this week.',
-      action: { label: i18n.t('recipient.remindMe'), type: 'reminder', payload: 'boil_water' },
+      message: i18n.t('nudges.sun'),
+      action: { label: i18n.t('recipient.remindMe'), type: 'reminder', payload: 'morning_sun' },
       priority: 'normal',
       expiresAt: inDays(10),
     },
     {
-      id: 'ndg_vax',
+      id: 'ndg_bp',
+      recipientId,
+      icon: 'heart',
+      message: i18n.t('nudges.bp'),
+      action: { label: i18n.t('recipient.seeClinic'), type: 'clinic', payload: 'ven_dhc' },
+      priority: 'normal',
+      expiresAt: inDays(14),
+    },
+    {
+      id: 'ndg_flu',
       recipientId,
       icon: 'alert-circle',
-      message:
-        i18n.language === 'ar'
-          ? 'حملة تطعيم الحصبة يوم السبت في عيادة توماني المجتمعية — مجانية للجميع.'
-          : 'Measles vaccination drive Saturday at Tumaini Community Clinic — free for all children.',
-      action: { label: i18n.t('recipient.seeClinic'), type: 'clinic', payload: 'ven_tumaini_clinic' },
+      message: i18n.t('nudges.flu'),
+      action: { label: i18n.t('recipient.seeClinic'), type: 'clinic', payload: 'ven_dhc' },
       priority: 'alert',
       expiresAt: inDays(4),
     },

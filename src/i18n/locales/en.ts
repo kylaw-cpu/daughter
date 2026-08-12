@@ -202,6 +202,10 @@ export const en = {
         name: 'Clinic Visit + Vitamins',
         description: 'One clinic consultation with vitamins included.',
       },
+      elderly_care: {
+        name: 'Elderly Wellness Box',
+        description: 'Rice, canned fish, nutrition milk and vitamins for older family members.',
+      },
       items: {
         eggs_30: 'Eggs (30)',
         lentils_2kg: 'Lentils (2 kg)',
@@ -217,7 +221,16 @@ export const en = {
         deworming: 'Deworming tablets',
         consultation: 'Clinic consultation',
         multivitamins: 'Multivitamins (30 days)',
+        canned_fish: 'Canned dace (2)',
+        nutrition_milk: 'Nutrition milk powder (900 g)',
+        calcium: 'Calcium tablets (60)',
+        bp_check: 'Blood-pressure check credit',
       },
+    },
+    nudges: {
+      sun: 'Morning sun keeps bones strong — 15 minutes before 10am is plenty.',
+      bp: 'A free blood-pressure check is waiting at the District Health Centre — no booking needed.',
+      flu: 'Free flu jabs for everyone 65+ this Saturday at the District Health Centre.',
     },
     ds: { title: 'Design system' },
   },
