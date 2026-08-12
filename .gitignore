@@ -7,3 +7,4 @@ web-build/
 .env*.local
 dist-web-preview/
 sendplate-preview.html
+.env

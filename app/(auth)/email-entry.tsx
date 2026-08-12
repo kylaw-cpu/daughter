@@ -8,17 +8,12 @@ import { useAuth } from '@/store/auth';
 
 const emailSchema = z.string().trim().email();
 
-/**
- * Self-contained sign-in: the email is the account identity on this device
- * and the 4-digit PIN is the security. No verification email is sent —
- * that would require a third-party mail service (deliberately avoided).
- */
+/** Account verification is email + one-time code (replaces phone/SMS OTP). */
 export default function EmailEntryScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const toast = useToast();
   const setPendingEmail = useAuth((s) => s.setPendingEmail);
-  const setUser = useAuth((s) => s.setUser);
 
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | undefined>();
@@ -32,18 +27,11 @@ export default function EmailEntryScreen() {
     }
     setError(undefined);
     setLoading(true);
-    const normalized = parsed.data.toLowerCase();
-    setPendingEmail(normalized);
     try {
-      // Returning account on this device: straight back in (PIN gate still
-      // applies at launch); otherwise continue to profile setup.
-      const existing = await api.getMe().catch(() => null);
-      if (existing && existing.email === normalized) {
-        await setUser(existing);
-        router.replace('/');
-      } else {
-        router.push('/(auth)/profile-setup');
-      }
+      const normalized = parsed.data.toLowerCase();
+      const { requestId } = await api.requestOtp(normalized);
+      setPendingEmail(normalized, requestId);
+      router.push('/(auth)/otp-verify');
     } catch {
       toast.show(t('common.genericError'), 'error');
     } finally {
