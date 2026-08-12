@@ -12,6 +12,7 @@ import { formatMoney } from '@/lib/money';
 import { track } from '@/analytics/analytics';
 import { useAuth } from '@/store/auth';
 import { useSendFlow } from '@/store/sendFlow';
+import type { Order } from '@/api/types';
 import { radius, spacing } from '@/theme/theme';
 import { useTheme } from '@/theme/ThemeProvider';
 import { useReducedMotion } from '@/lib/useReducedMotion';
@@ -73,6 +74,9 @@ export default function PayScreen() {
         idemKey,
       });
       track('payment_succeeded', { orderId: draftOrder.id });
+      // Repeat-send within 30 days is the north-star metric (spec §14).
+      const prior = qc.getQueryData<Order[]>(keys.orders('sender'));
+      if (prior && prior.length > 0) track('repeat_send', { count: prior.length + 1 });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       setState('success');
       if (!reducedMotion) {

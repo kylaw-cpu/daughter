@@ -37,6 +37,9 @@ interface AuthState {
   pendingPhone: string | null;
   otpRequestId: string | null;
   hasPin: boolean;
+  /** Session-only flag: PIN entered since launch (never persisted). */
+  unlocked: boolean;
+  setUnlocked(unlocked: boolean): void;
 
   hydrate(): Promise<void>;
   setIntendedRole(role: Role): void;
@@ -55,6 +58,11 @@ export const useAuth = create<AuthState>((set, get) => ({
   pendingPhone: null,
   otpRequestId: null,
   hasPin: false,
+  unlocked: false,
+
+  setUnlocked(unlocked) {
+    set({ unlocked });
+  },
 
   async hydrate() {
     if (get().hydrated) return;
@@ -90,7 +98,7 @@ export const useAuth = create<AuthState>((set, get) => ({
 
   async savePin(pin) {
     await SecureStore.setItemAsync(PIN_KEY, hashPin(pin));
-    set({ hasPin: true });
+    set({ hasPin: true, unlocked: true });
   },
 
   async verifyPin(pin) {
@@ -110,6 +118,13 @@ export const useAuth = create<AuthState>((set, get) => ({
     } catch {
       // Best-effort cleanup.
     }
-    set({ user: null, intendedRole: null, pendingPhone: null, otpRequestId: null, hasPin: false });
+    set({
+      user: null,
+      intendedRole: null,
+      pendingPhone: null,
+      otpRequestId: null,
+      hasPin: false,
+      unlocked: false,
+    });
   },
 }));
