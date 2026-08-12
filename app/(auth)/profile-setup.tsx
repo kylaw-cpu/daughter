@@ -18,7 +18,7 @@ export default function ProfileSetupScreen() {
   const { t, i18n } = useTranslation();
   const { colors } = useTheme();
   const toast = useToast();
-  const { intendedRole, pendingPhone, savePin, setUser } = useAuth();
+  const { intendedRole, pendingEmail, savePin, setUser } = useAuth();
   const role = intendedRole ?? 'sender';
 
   const [step, setStep] = useState<Step>('profile');
@@ -54,7 +54,7 @@ export default function ProfileSetupScreen() {
       const user = await api.createProfile({
         name: name.trim(),
         role,
-        phone: pendingPhone ?? '',
+        email: pendingEmail ?? '',
         language: i18n.language,
       });
       if (role === 'sender' && recipientName.trim()) {

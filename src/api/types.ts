@@ -6,7 +6,8 @@ export interface User {
   id: string;
   role: Role;
   name: string;
-  phone: string; // E.164
+  email: string; // account identity + verification channel
+  phone?: string; // optional, E.164 — for SMS features later
   photoUrl?: string;
   language: string; // BCP-47, e.g. 'sw', 'ar', 'en'
   currency: string; // ISO 4217, sender's currency

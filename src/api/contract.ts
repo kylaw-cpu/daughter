@@ -13,8 +13,8 @@ import type {
  * HTTP client (Phase 4) both implement this, swapped by USE_MOCK_API.
  */
 export interface Api {
-  // Auth
-  requestOtp(phone: string): Promise<{ requestId: string }>;
+  // Auth (email + one-time code)
+  requestOtp(email: string): Promise<{ requestId: string }>;
   verifyOtp(requestId: string, code: string): Promise<{ token: string; user: User | null }>;
   setPin(pinHash: string): Promise<{ ok: boolean }>;
 
@@ -22,7 +22,7 @@ export interface Api {
   getMe(): Promise<User>;
   patchMe(patch: Partial<Pick<User, 'name' | 'language' | 'role' | 'photoUrl'>>): Promise<User>;
   /** Mock-only convenience for first-run profile setup. */
-  createProfile(input: { name: string; role: User['role']; phone: string; language: string }): Promise<User>;
+  createProfile(input: { name: string; role: User['role']; email: string; language: string }): Promise<User>;
 
   // Sender
   listRecipients(): Promise<Recipient[]>;

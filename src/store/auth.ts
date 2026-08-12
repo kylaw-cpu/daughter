@@ -33,8 +33,8 @@ interface AuthState {
   user: User | null;
   /** Role picked on the welcome screen, before an account exists. */
   intendedRole: Role | null;
-  /** Phone captured during onboarding. */
-  pendingPhone: string | null;
+  /** Email captured during onboarding. */
+  pendingEmail: string | null;
   otpRequestId: string | null;
   hasPin: boolean;
   /** Session-only flag: PIN entered since launch (never persisted). */
@@ -43,7 +43,7 @@ interface AuthState {
 
   hydrate(): Promise<void>;
   setIntendedRole(role: Role): void;
-  setPendingPhone(phone: string, requestId: string): void;
+  setPendingEmail(email: string, requestId: string): void;
   setUser(user: User | null): Promise<void>;
   savePin(pin: string): Promise<void>;
   verifyPin(pin: string): Promise<boolean>;
@@ -55,7 +55,7 @@ export const useAuth = create<AuthState>((set, get) => ({
   hydrated: false,
   user: null,
   intendedRole: null,
-  pendingPhone: null,
+  pendingEmail: null,
   otpRequestId: null,
   hasPin: false,
   unlocked: false,
@@ -82,8 +82,8 @@ export const useAuth = create<AuthState>((set, get) => ({
     set({ intendedRole: role });
   },
 
-  setPendingPhone(phone, requestId) {
-    set({ pendingPhone: phone, otpRequestId: requestId });
+  setPendingEmail(email, requestId) {
+    set({ pendingEmail: email, otpRequestId: requestId });
   },
 
   async setUser(user) {
@@ -121,7 +121,7 @@ export const useAuth = create<AuthState>((set, get) => ({
     set({
       user: null,
       intendedRole: null,
-      pendingPhone: null,
+      pendingEmail: null,
       otpRequestId: null,
       hasPin: false,
       unlocked: false,

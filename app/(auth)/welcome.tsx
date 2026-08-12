@@ -36,7 +36,7 @@ export default function WelcomeScreen() {
   const choose = (role: Role) => {
     setIntendedRole(role);
     track('onboarding_started', { role });
-    router.push('/(auth)/phone-entry');
+    router.push('/(auth)/email-entry');
   };
 
   return (

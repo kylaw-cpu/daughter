@@ -12,7 +12,7 @@ const RESEND_SECONDS = 30;
 export default function OtpVerifyScreen() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { pendingPhone, otpRequestId, setPendingPhone, saveToken, setUser } = useAuth();
+  const { pendingEmail, otpRequestId, setPendingEmail, saveToken, setUser } = useAuth();
   const [code, setCode] = useState('');
   const [error, setError] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -48,11 +48,11 @@ export default function OtpVerifyScreen() {
   };
 
   const resend = async () => {
-    if (!pendingPhone) return;
+    if (!pendingEmail) return;
     setCountdown(RESEND_SECONDS);
     try {
-      const { requestId } = await api.requestOtp(pendingPhone);
-      setPendingPhone(pendingPhone, requestId);
+      const { requestId } = await api.requestOtp(pendingEmail);
+      setPendingEmail(pendingEmail, requestId);
     } catch {
       // Quietly allow another tap; the timer already reset.
     }
@@ -62,7 +62,7 @@ export default function OtpVerifyScreen() {
     <Screen>
       <ScreenHeader
         title={t('auth.otpTitle')}
-        subtitle={t('auth.otpSentTo', { phone: pendingPhone ?? '' })}
+        subtitle={t('auth.otpSentTo', { email: pendingEmail ?? '' })}
         back
       />
       <View style={{ gap: spacing.xl, marginTop: spacing.md }}>
@@ -101,12 +101,12 @@ export default function OtpVerifyScreen() {
           )}
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={t('auth.changeNumber')}
+            accessibilityLabel={t('auth.changeEmail')}
             onPress={() => router.back()}
             style={{ minHeight: touchTarget, justifyContent: 'center' }}
           >
             <Text variant="bodyStrong" color="brand">
-              {t('auth.changeNumber')}
+              {t('auth.changeEmail')}
             </Text>
           </Pressable>
         </View>

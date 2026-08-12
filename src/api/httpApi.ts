@@ -30,7 +30,7 @@ export function createHttpApi(baseURL: string): Api {
   });
 
   return {
-    requestOtp: async (phone) => (await client.post('/auth/otp/request', { phone })).data,
+    requestOtp: async (email) => (await client.post('/auth/otp/request', { email })).data,
     verifyOtp: async (requestId, code) =>
       (await client.post('/auth/otp/verify', { requestId, code })).data,
     setPin: async (pinHash) => (await client.post('/auth/pin', { pinHash })).data,

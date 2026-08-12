@@ -104,7 +104,7 @@ async function progressOrders(d: MockDb): Promise<void> {
       const vendor = MOCK_VENDORS.find((v) => order.eligibleVendorIds.includes(v.id));
       order.status = 'collected';
       order.proof = {
-        vendorId: vendor?.id ?? 'ven_mama_akinyi',
+        vendorId: vendor?.id ?? 'ven_wing_kee',
         collectedAt: new Date().toISOString(),
         photoUrl: PROOF_PHOTO_PLACEHOLDER,
         note: '已交收所有物品 · All items handed over',
@@ -144,7 +144,7 @@ async function seedRecipientDemo(d: MockDb): Promise<void> {
     id: id('rcp'),
     senderId: 'usr_demo_sender',
     name: d.user?.name ?? 'Mama',
-    phone: d.user?.phone ?? '+85291234567',
+    phone: '+85291234567',
     relationship: 'daughter',
     town: 'Sham Shui Po 深水埗',
     language: d.user?.language ?? 'en',
@@ -172,9 +172,9 @@ async function seedRecipientDemo(d: MockDb): Promise<void> {
 }
 
 export const mockApi: Api = {
-  async requestOtp(phone) {
+  async requestOtp(email) {
     await delay(500);
-    void phone;
+    void email;
     return { requestId: id('otp') };
   },
 
@@ -214,7 +214,7 @@ export const mockApi: Api = {
       id: id('usr'),
       role: input.role,
       name: input.name,
-      phone: input.phone,
+      email: input.email,
       language: input.language,
       currency: SENDER_CURRENCY,
       createdAt: new Date().toISOString(),
@@ -352,7 +352,7 @@ export const mockApi: Api = {
     }
     order.status = 'collected';
     order.proof = {
-      vendorId: 'ven_mama_akinyi',
+      vendorId: 'ven_wing_kee',
       collectedAt: new Date().toISOString(),
       photoUrl: input.photoUri,
       note: input.note,

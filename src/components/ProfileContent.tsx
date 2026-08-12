@@ -46,7 +46,7 @@ export function ProfileContent({ showCallForHelp = false }: { showCallForHelp?: 
           <View style={{ flex: 1 }}>
             <Text variant="h2">{user?.name ?? ''}</Text>
             <Text variant="body" color="secondary">
-              {user?.phone ?? ''}
+              {user?.email ?? ''}
             </Text>
           </View>
         </View>
@@ -89,7 +89,7 @@ export function ProfileContent({ showCallForHelp = false }: { showCallForHelp?: 
         <Button
           label={t('recipient.callHelp')}
           icon={<Feather name="phone-call" size={20} color={colors.onPrimary} />}
-          onPress={() => Linking.openURL('tel:+254800724724').catch(() => {})}
+          onPress={() => Linking.openURL('tel:+85221234567').catch(() => {})}
         />
       )}
 

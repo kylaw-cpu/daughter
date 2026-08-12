@@ -42,7 +42,7 @@ no server.
 
 ## Demo walkthrough (single device plays all three roles)
 
-1. **Sender**: Welcome → "I'm sending" → any phone number → any 6-digit OTP
+1. **Sender**: Welcome → "I'm sending" → any email address → any 6-digit code
    (except `000000`, which demos the error state) → profile + first recipient
    → set PIN. Send flow: choose recipient → package → customize → review →
    pay ("Visa •••• 4242" succeeds; the other methods demo decline/pending).
@@ -84,6 +84,29 @@ src/
 - **Phase 4** — real backend (`src/api/httpApi.ts` already implements the REST
   contract), Stripe PaymentSheet, push notifications, photo upload, SMS-only recipients
 - **Phase 5** — beta hardening: crash reporting, remote config, field tests on 2G
+
+## Sending verification codes (Phase 4)
+
+Sign-in is email + 6-digit code. The app calls `POST /auth/otp/request`
+(`src/api/httpApi.ts`); the backend generates the code and emails it via a
+transactional provider. Free options that work well for OTP volume (2026):
+
+- **Resend** — 3,000 emails/month free (100/day), the nicest developer API:
+  ```js
+  import { Resend } from 'resend';
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  await resend.emails.send({
+    from: 'SendPlate <verify@yourdomain.com>',
+    to: email,
+    subject: `${code} is your SendPlate code`,
+    text: `Your SendPlate verification code is ${code}. It expires in 10 minutes.`,
+  });
+  ```
+- **Brevo** — 300 emails/day free with no expiry; higher steady-state volume.
+- SendGrid's free plan was retired in 2025 (60-day trial only) — avoid.
+
+Either provider needs a verified sending domain for good deliverability
+(SPF + DKIM records).
 
 ## Notes on deliberate choices
 
