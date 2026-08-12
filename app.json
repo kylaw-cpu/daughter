@@ -1,0 +1,45 @@
+{
+  "expo": {
+    "name": "SendPlate",
+    "slug": "sendplate",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "sendplate",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "backgroundColor": "#FBF8F4",
+    "ios": {
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSCameraUsageDescription": "SendPlate uses the camera to scan claim codes and photograph delivery proof."
+      }
+    },
+    "android": {
+      "package": "org.sendplate.app",
+      "edgeToEdgeEnabled": true,
+      "permissions": ["CAMERA"]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "extra": {
+      "USE_MOCK_API": true
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-secure-store",
+      "expo-localization",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "SendPlate uses the camera to scan claim codes and photograph delivery proof."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
