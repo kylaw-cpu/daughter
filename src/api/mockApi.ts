@@ -10,6 +10,7 @@ import {
   User,
   Vendor,
 } from './types';
+import { priceItems, toSenderAmount } from '@/lib/pricing';
 import {
   FX_RATE,
   LOCAL_CURRENCY,
@@ -123,18 +124,8 @@ async function progressOrders(d: MockDb): Promise<void> {
 }
 
 function priceOrder(items: PackageItem[], template: PackageTemplate) {
-  const perItemLocal = Math.round(template.basePriceLocal / Math.max(1, template.baseItems.length));
-  const addOnKeys = new Set(template.addOns.map((a) => a.key));
-  let amountLocal = 0;
-  for (const it of items) {
-    // Add-ons priced flat at ~12% of the base package each; base items pro-rata.
-    const unit = addOnKeys.has(it.key) && !template.baseItems.some((b) => b.key === it.key)
-      ? Math.round(template.basePriceLocal * 0.12)
-      : perItemLocal;
-    amountLocal += unit * it.quantity;
-  }
-  const amountSender = Math.round(amountLocal / FX_RATE);
-  const serviceFee = Math.max(99, Math.round(amountSender * 0.05));
+  const amountLocal = priceItems(items, template);
+  const { amountSender, serviceFee } = toSenderAmount(amountLocal, FX_RATE);
   return { amountLocal, amountSender, serviceFee };
 }
 
