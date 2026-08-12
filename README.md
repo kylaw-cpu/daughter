@@ -26,7 +26,7 @@ Sender picks a package → pays → Recipient gets a claim code
 - **expo-secure-store** (token + salted PIN hash), **AsyncStorage** (offline caches, mock DB)
 - **expo-camera** (QR scan + proof photos), **react-native-qrcode-svg** (code display)
 - **expo-speech** (audio prompts), **expo-brightness** (code-screen boost)
-- Payments behind a `PaymentProvider` interface (mock now; Stripe PaymentSheet in Phase 4)
+- Payments behind a `PaymentProvider` interface (in-app demo balance; no processor)
 
 ## Running
 
@@ -42,9 +42,8 @@ no server.
 
 ## Demo walkthrough (single device plays all three roles)
 
-1. **Sender**: Welcome → "I'm sending" → any email address → any 6-digit code
-   (except `000000`, which demos the error state) → profile + first recipient
-   → set PIN. Send flow: choose recipient → package → customize → review →
+1. **Sender**: Welcome → "I'm sending" → your email address → profile + first
+   recipient → set PIN. Send flow: choose recipient → package → customize → review →
    pay ("Visa •••• 4242" succeeds; the other methods demo decline/pending).
 2. Watch **Activity**: the order goes *Sent → Ready to collect* (~8 s). After
    ~90 s the mock auto-collects with a proof photo — or play vendor yourself:
@@ -81,50 +80,32 @@ src/
 - **Phase 1** — auth + sender happy path (send flow, pay states, activity feed) ✅
 - **Phase 2** — recipient (offline code, health) + vendor (scan, redeem, offline queue) ✅
 - **Phase 3** — states, a11y, RTL, haptics, PIN gate, analytics events ✅
-- **Phase 4** — real backend (`src/api/httpApi.ts` already implements the REST
-  contract), Stripe PaymentSheet, push notifications, photo upload, SMS-only recipients
+- **Phase 4** — optional self-hosted backend (`src/api/httpApi.ts` already
+  implements the REST contract); payments/notifications only if a provider
+  is ever wanted
 - **Phase 5** — beta hardening: crash reporting, remote config, field tests on 2G
 
-## Real verification codes with Resend
+## No third-party services
 
-Sign-in is email + 6-digit code. `server/index.mjs` is a zero-dependency
-auth service that generates codes, stores them hashed with a 10-minute
-expiry, and emails them through Resend (free tier: 3,000 emails/month,
-100/day). The rest of the app keeps running on the mock until Phase 4.
+The app is deliberately self-contained — nothing to sign up for, nothing to
+host:
 
-Setup:
-
-1. Create a free account at https://resend.com and copy an API key
-   (starts with `re_`).
-2. Start the auth service:
-   ```bash
-   RESEND_API_KEY=re_xxx npm run auth-server
-   ```
-   Without a key it runs in dev mode and prints codes to the console.
-   Without a verified domain, Resend's shared `onboarding@resend.dev`
-   sender can only deliver to the email that owns your Resend account —
-   fine for testing yourself.
-3. Point the app at it (use your machine's LAN IP so a phone can reach it):
-   ```bash
-   EXPO_PUBLIC_AUTH_API_URL=http://192.168.1.20:8787 npx expo start
-   ```
-   When unset, the app falls back to the mock (any code works).
-4. For real users: verify your sending domain in Resend (SPF + DKIM DNS
-   records) and set `RESEND_FROM="SendPlate <verify@yourdomain.com>"` —
-   codes from unverified senders land in spam.
-
-The service enforces: hashed single-use codes, 10-minute expiry, 5 attempts
-per code, a 30-second resend cooldown per email. Codes live in memory —
-swap for Redis/Postgres when running more than one instance (Phase 4).
-
-Alternative free provider if volume outgrows Resend's 100/day: Brevo
-(300 emails/day). SendGrid's free plan was retired in 2025.
+- **Sign-in** is your email address (the account identity on the device)
+  plus a 4-digit PIN. No verification email is sent, because that would
+  require a mail provider; the PIN is the security. The `POST /auth/otp/*`
+  endpoints remain in the API contract for a future self-hosted backend.
+- **Payments** are recorded against an in-app demo balance behind the
+  `PaymentProvider` interface. Real card processing inherently requires a
+  processor; when that day comes, only the provider implementation changes.
+- **Proof photos** are captured with the device camera and stay on device.
+- **The backend is the on-device mock** (AsyncStorage). `USE_MOCK_API=false`
+  plus `src/api/httpApi.ts` is the seam for a self-hosted server later.
 
 ## Notes on deliberate choices
 
-- **Stripe SDK not yet wired**: the PaymentSheet needs a backend to mint
-  PaymentIntents; until Phase 4 the `PaymentProvider` mock exercises every
-  payment state (success/decline/pending) without dead native code.
+- **No payment processor**: the `PaymentProvider` demo balance exercises
+  every payment state (success/decline/pending); a real processor slots in
+  behind the same interface if ever needed.
 - **Status progression is computed lazily** in the mock (on read, not timers)
   so it survives app restarts; `paid → ready` ≈ 8 s, demo auto-collect ≈ 90 s
   to leave time for a manual vendor demo.

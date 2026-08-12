@@ -35,7 +35,6 @@ interface AuthState {
   intendedRole: Role | null;
   /** Email captured during onboarding. */
   pendingEmail: string | null;
-  otpRequestId: string | null;
   hasPin: boolean;
   /** Session-only flag: PIN entered since launch (never persisted). */
   unlocked: boolean;
@@ -43,7 +42,7 @@ interface AuthState {
 
   hydrate(): Promise<void>;
   setIntendedRole(role: Role): void;
-  setPendingEmail(email: string, requestId: string): void;
+  setPendingEmail(email: string): void;
   setUser(user: User | null): Promise<void>;
   savePin(pin: string): Promise<void>;
   verifyPin(pin: string): Promise<boolean>;
@@ -56,7 +55,6 @@ export const useAuth = create<AuthState>((set, get) => ({
   user: null,
   intendedRole: null,
   pendingEmail: null,
-  otpRequestId: null,
   hasPin: false,
   unlocked: false,
 
@@ -82,8 +80,8 @@ export const useAuth = create<AuthState>((set, get) => ({
     set({ intendedRole: role });
   },
 
-  setPendingEmail(email, requestId) {
-    set({ pendingEmail: email, otpRequestId: requestId });
+  setPendingEmail(email) {
+    set({ pendingEmail: email });
   },
 
   async setUser(user) {
@@ -122,7 +120,6 @@ export const useAuth = create<AuthState>((set, get) => ({
       user: null,
       intendedRole: null,
       pendingEmail: null,
-      otpRequestId: null,
       hasPin: false,
       unlocked: false,
     });

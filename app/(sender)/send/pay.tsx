@@ -20,14 +20,15 @@ import { useReducedMotion } from '@/lib/useReducedMotion';
 type PayState = 'idle' | 'processing' | 'success' | 'failure' | 'pending';
 
 /**
- * Send flow step 5. The demo payment methods exercise every state the spec
- * requires (§6.2): success, decline (retry keeps the order), and async-pending.
- * Real Stripe PaymentSheet slots in behind PaymentProvider in Phase 4.
+ * Send flow step 5. No third-party payment processor: the in-app demo
+ * balance records the payment, and the extra methods exercise the decline
+ * and async-pending states the spec requires (§6.2). A real processor can
+ * slot in behind PaymentProvider later without touching this flow.
  */
 const METHODS = [
-  { id: 'saved_visa', simulate: 'succeed', icon: 'credit-card', label: 'Visa •••• 4242' },
-  { id: 'test_declined', simulate: 'fail', icon: 'x-octagon', label: 'Test: declined card' },
-  { id: 'test_pending', simulate: 'pending', icon: 'clock', label: 'Test: mobile money (async)' },
+  { id: 'demo_balance', simulate: 'succeed', icon: 'credit-card', labelKey: 'sender.payMethodDemo' },
+  { id: 'test_declined', simulate: 'fail', icon: 'x-octagon', labelKey: 'sender.payMethodDeclined' },
+  { id: 'test_pending', simulate: 'pending', icon: 'clock', labelKey: 'sender.payMethodPending' },
 ] as const;
 
 export default function PayScreen() {
@@ -194,7 +195,7 @@ export default function PayScreen() {
               key={m.id}
               accessibilityRole="radio"
               accessibilityState={{ selected: active }}
-              accessibilityLabel={m.label}
+              accessibilityLabel={t(m.labelKey)}
               onPress={() => setMethod(m)}
               style={{
                 flexDirection: 'row',
@@ -210,7 +211,7 @@ export default function PayScreen() {
             >
               <Feather name={m.icon} size={22} color={active ? colors.primary : colors.textMuted} />
               <Text variant="bodyStrong" style={{ flex: 1 }}>
-                {m.label}
+                {t(m.labelKey)}
               </Text>
               {active && <Feather name="check-circle" size={20} color={colors.primary} />}
             </Pressable>
